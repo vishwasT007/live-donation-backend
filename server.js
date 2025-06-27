@@ -6,32 +6,30 @@ const cors = require("cors");
 // --- Configuration ---
 dotenv.config();
 const app = express();
+const PORT = process.env.PORT || 4000;
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
 // --- Middleware ---
-app.use(cors());
+app.use(
+  cors({
+    origin: CLIENT_URL,
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 // --- Routes ---
-// Test route
+// Root health check
 app.get("/", (req, res) => {
   res.send("Mandal Donation App Backend Running ✅");
 });
 
-// Auth routes
-const authRoutes = require("./routes/authRoutes");
-app.use("/api/auth", authRoutes);
-
-// Donation routes (Add, Get, Edit, Delete)
-const donationRoutes = require("./routes/donationRoutes");
-app.use("/api/donations", donationRoutes);
-
-// Dashboard statistics routes
-const dashboardRoutes = require("./routes/dashboardRoutes");
-app.use("/api/dashboard", dashboardRoutes);
-
-// Report routes (Recent donations, Export to Excel)
-const reportRoutes = require("./routes/reportRoutes");
-app.use("/api/report", reportRoutes);
+// Routes
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/donations", require("./routes/donationRoutes"));
+app.use("/api/dashboard", require("./routes/dashboardRoutes"));
+app.use("/api/report", require("./routes/reportRoutes"));
 
 // --- Database Connection & Server Start ---
 const connectDB = async () => {
@@ -39,8 +37,8 @@ const connectDB = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ MongoDB connected");
 
-    app.listen(process.env.PORT, () =>
-      console.log(`🚀 Server running on port ${process.env.PORT}`)
+    app.listen(PORT, () =>
+      console.log(`🚀 Server running on http://localhost:${PORT}`)
     );
   } catch (err) {
     console.error("❌ MongoDB connection error:", err.message);
