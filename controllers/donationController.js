@@ -1,4 +1,4 @@
-const Donation = require("../models/Donation");
+const Donation = require("../models/donation");
 const { sendSMS } = require("../services/sms");
 
 // ➕ Add Donation
